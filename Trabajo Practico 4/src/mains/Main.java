@@ -1,6 +1,7 @@
 package mains;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -14,7 +15,7 @@ public class Main {
 		// TP nro 4, metodos por referencia con objeto definido e objeto indefinidop
 		//Ejemplo de uso, creacion de lista con 50 rectangulkos distintos.
 		var listaRectangulos = Stream.generate(Rectangulo::getRandom).limit(50).toList();
-		//hoja 2 
+		//Hoja 2 parte 1 
 		//1) crear una lista de a partir de un stream formado con los dias de la semana:
 		var listaDias = Stream.of("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo").toList();
 		
@@ -37,7 +38,7 @@ public class Main {
 		listaRectangulos.stream().forEach(duplicarBaseR);
 		listaRectangulos.forEach(mostrarRectangulo);
 		
-		//Hoja 3
+		//Hoja 3 parte 1
 		//1)Evaluar si todas las personas son mayores de 20 años
 		boolean mayoresDeVeinte = listaPersonas.stream().allMatch(p -> p.getEdad() > 20 );
 		System.out.println(mayoresDeVeinte ? "Todos son mayores de 20" : "Hay menores de 20");
@@ -65,7 +66,28 @@ public class Main {
 		Predicate<Rectangulo> alturaDobleBase = r -> r.getAltura() > r.getBase() * 2;
 		boolean rectanguloAlturaDobleBase = listaRectangulos.stream().noneMatch(alturaDobleBase);
 		System.out.println(rectanguloAlturaDobleBase ? "No hay rectangulos con altura mayor al doble de la base." : "Hay rectangulos con altura mayor al doble de la base.");
-
+		
+		//Hoja 3 Parte 2
+		//1) Buscar el rectángulo con mayor área.
+		Optional<Rectangulo> optRectMayorArea = listaRectangulos.stream().max(Comparator.comparing(Rectangulo::getArea));
+		if (optRectMayorArea.isPresent()) {
+		    System.out.println(optRectMayorArea.get());
+		} else {
+		    System.out.println("No se encontró un rectangulo.");
+		}
+		
+		//2) Buscar la persona con menor edad.
+		Optional<Persona> masJoven = listaPersonas.stream().min(Comparator.comparing(Persona::getEdad));
+		masJoven.ifPresent(persona -> System.out.println("Persona mas joven: " + persona));
+		
+		//3) Buscar el rectángulo con mayor perímetro.
+		Optional<Rectangulo> mayorPerimetro = listaRectangulos.stream().max(Comparator.comparing(Rectangulo::getPerimetro));
+		mayorPerimetro.ifPresent(rectangulo -> System.out.println("Perimetro mas grande: " + rectangulo));
+		
+		//4) Obtener el primer elemento de la lista de rectangulos
+		Optional<Rectangulo> primerRectangulo = listaRectangulos.stream().findFirst();
+		primerRectangulo.ifPresent(mostrarRectangulo);
+		
 	}
 
 }
