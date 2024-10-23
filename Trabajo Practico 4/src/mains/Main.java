@@ -3,6 +3,7 @@ package mains;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -88,6 +89,90 @@ public class Main {
 		Optional<Rectangulo> primerRectangulo = listaRectangulos.stream().findFirst();
 		primerRectangulo.ifPresent(mostrarRectangulo);
 		
+		//Hoja 4 primer parte
+		
+		//1) Mostrar todos los rectángulos con base mayor a su altura.
+		listaRectangulos.stream().filter(r -> r.getBase() > r.getAltura()).forEach(mostrarRectangulo);
+		
+		//2) Incrementar en 0.4 la estatura de todas las personas que midan menos de 1.4
+		System.out.println("Lista de personas");
+		listaPersonas.stream().forEach(mostrarPersona);
+		listaPersonas.stream().filter( p -> p.getEstatura() < 1.4 ).forEach( p -> p.setEstatura(p.getEstatura() + 0.4 ));
+		System.out.println("Lista de personas con altura modificada");
+		listaPersonas.stream().forEach(mostrarPersona);
+		//3) Encontrar a la persona más alta de las que tengan menos de 40 años.
+		Optional<Persona> masAlto = listaPersonas.stream().filter( p -> p.getEdad() < 40 ).max(Comparator.comparing(Persona::getEstatura));
+		masAlto.ifPresent(p -> System.out.println("Persona mas alta de menos de 40: " + p));
+		
+		//4) Encontrar a la persona más baja que cuyo nombre empiece con J.
+		Optional<Persona> bajaConJ = listaPersonas.stream().filter(p -> p.getNombre().startsWith("J")).min(Comparator.comparing(Persona::getEstatura));
+		bajaConJ.ifPresent(p -> System.out.println("Persona mas baja con nombre que empieza con J: " + p));
+		
+		//5) Mostrar todos los rectángulos cuya área sea mayor a 2000 y su perímetro sea mayor al área.
+		Predicate<Rectangulo> areaMayor2000 = r -> r.getArea() > 2000;
+		Predicate<Rectangulo> perimetroMayorArea = r -> r.getPerimetro() > r.getArea();
+		Predicate<Rectangulo> areaMayorPerimetroMayor = areaMayor2000.and(perimetroMayorArea);
+		
+		//Ya que la condicion es muy especifica, y posiblemente no sea cumplida, hacemos if para mostrar los rectangulos o mostramos un mensaje diciendo que no hay rectangulos.
+		if (listaRectangulos.stream().filter(areaMayorPerimetroMayor).findAny().isPresent()) {
+			System.out.println("Rectangulos area mayor a 2000 y perimetro mayor area.");
+		    listaRectangulos.stream().filter(areaMayorPerimetroMayor).forEach(mostrarRectangulo);
+		} else {
+		    System.out.println("No hay rectángulos que cumplan con las condiciones: área mayor a 2000 y perímetro mayor al área.");
+		}
+				
+		//Hoja 4 segunda parte
+		
+		//1) Mostrar los rectángulos ordenados por área.
+		Comparator<Rectangulo> compArea = Comparator.comparing(Rectangulo::getArea);
+		System.out.println("Lista rectangulos por area: ");
+		listaRectangulos.stream().sorted(compArea).forEach(mostrarRectangulo);
+		
+		//2) Traer una lista de personas ordenadas por altura.}
+		System.out.println("Listado personas por altura");
+		listaPersonas.stream().sorted( Comparator.comparing(Persona::getEstatura)).forEach(mostrarPersona);
+		
+		//3) Mostrar los rectángulos ordenados por perímetro decrecientemente.
+		Comparator<Rectangulo> perimetroDecreciente = Comparator.comparing(Rectangulo::getPerimetro).reversed();
+		System.out.println("Lista de rectangulos ordenada, por perimetro decreciente.");
+		listaRectangulos.stream().sorted(perimetroDecreciente).forEach(mostrarRectangulo);
+		
+		//4) Obtener una lista de las personas ordenadas por edad y si tienen la misma edad, usar la estatura como segundo criterio.
+		Comparator<Persona> edadYEstatura = Comparator.comparing(Persona::getEstatura).thenComparing(Persona::getEdad);
+		System.out.println("Listado de personas ordenadas por estatura y edad:");
+		listaPersonas.stream().sorted(edadYEstatura).forEach(mostrarPersona);
+		
+		//Hoja 5
+		
+		//1) Obtener una lista con solo los nombres de las personas (Puede repetir)
+		Function<Persona, String> toNombre = p -> p.getNombre();
+		var listaNombres = listaPersonas.stream().map(toNombre).toList();
+		System.out.println("Lista nombres: ");
+		listaNombres.stream().forEach( n -> System.out.print(" |" + n));
+		
+		//2) Obtener una lista con las áreas de todos los rectángulos.
+		Function<Rectangulo, Double> toArea =  r -> r.getArea();
+		var listaAreas = listaRectangulos.stream().map(toArea).toList();
+		System.out.println("");
+		System.out.println("Lista areas: ");
+		listaAreas.stream().forEach( n -> System.out.print(" |" + n));
+		
+		//3) Obtener una lista con la suma del área y el perímetro de cada uno de los rectángulos.
+		Function<Rectangulo, Double> toAreaYPerimetro = r -> r.getArea() + r.getPerimetro();
+		var listaAreasYPerimetros = listaRectangulos.stream().map(toAreaYPerimetro).toList();
+		System.out.println("");
+		System.out.println("Lista de sumas de areas y perimetros: ");
+		listaAreasYPerimetros.stream().forEach( n -> System.out.print(" |" + n));
+		
+		//4) Obtener una lista con todas las personas convertidas en rectángulos siendo su altura: la estatura de la persona * 50 y la base: el peso de la persona.
+		Function<Persona, Rectangulo> personaToRectangulo = p -> new Rectangulo("", p.getPeso(), p.getEstatura() * 50);
+		var listaPersonasToRectangulo = listaPersonas.stream().map(personaToRectangulo).toList();
+		System.out.println("Lista de personas convertidas en rectangulos: ");
+		listaPersonasToRectangulo.stream().forEach(mostrarRectangulo);
+		
+		//5) Obtener una lista con la suma del área y el perímetro de cada una de las personas (Si fueran rectángulos)
+		System.out.println("Lista de sumas de areas y perimetros de personas convertidas en rectangulos: ");
+		listaPersonasToRectangulo.stream().map(toAreaYPerimetro).forEach( n -> System.out.print(" |" + n));
 	}
 
 }
